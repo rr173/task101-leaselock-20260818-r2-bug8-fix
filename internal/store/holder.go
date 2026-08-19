@@ -96,6 +96,13 @@ func (s *Store) DeleteHolder(id string, now time.Time) error {
 		if n > 0 {
 			return lease.ErrHolderHasLeases
 		}
+		wn, err := countPendingWaitersByHolder(tx, id)
+		if err != nil {
+			return err
+		}
+		if wn > 0 {
+			return lease.ErrHolderHasWaiters
+		}
 		return b.Delete([]byte(id))
 	})
 }
